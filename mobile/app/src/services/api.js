@@ -25,8 +25,11 @@ const getBaseUrl = () => {
   return 'http://localhost:5000/api';
 };
 
+const activeBaseUrl = getBaseUrl();
+console.log('🔗 [API Service] Connected to:', activeBaseUrl);
+
 const API = axios.create({
-  baseURL: getBaseUrl(),
+  baseURL: activeBaseUrl,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -37,9 +40,11 @@ const API = axios.create({
 API.interceptors.request.use(
   async (config) => {
     try {
-      const token = await AsyncStorage.getItem('user_token');
-      if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
+      if (typeof window !== 'undefined') {
+        const token = await AsyncStorage.getItem('user_token');
+        if (token) {
+          config.headers.Authorization = `Bearer ${token}`;
+        }
       }
     } catch (e) {
       console.error('Error fetching token from AsyncStorage:', e);
