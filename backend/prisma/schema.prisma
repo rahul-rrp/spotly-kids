@@ -1,0 +1,66 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           Int           @id @default(autoincrement())
+  name         String
+  email        String        @unique
+  passwordHash String
+  children     Child[]
+  applications Application[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+}
+
+model Child {
+  id           Int           @id @default(autoincrement())
+  userId       Int
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name         String
+  age          Int
+  city         String
+  applications Application[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+}
+
+model CastingCall {
+  id           Int           @id @default(autoincrement())
+  title        String
+  agencyName   String
+  description  String
+  city         String
+  ageMin       Int
+  ageMax       Int
+  language     String
+  category     String
+  amount       Int
+  deadline     String
+  imageUrl     String
+  isPro        Boolean       @default(false)
+  isVerified   Boolean       @default(true)
+  applications Application[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+}
+
+model Application {
+  id            Int         @id @default(autoincrement())
+  userId        Int
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  childId       Int
+  child         Child       @relation(fields: [childId], references: [id], onDelete: Cascade)
+  castingCallId Int
+  castingCall   CastingCall @relation(fields: [castingCallId], references: [id], onDelete: Cascade)
+  status        String      @default("PENDING")
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  @@unique([childId, castingCallId])
+}
