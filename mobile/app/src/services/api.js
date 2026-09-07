@@ -3,8 +3,12 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Platform } from 'react-native';
 import Constants from 'expo-constants';
 
-// Automatically detect backend host IP for physical devices, emulators, and web
+// Determine API Base URL (prefers EXPO_PUBLIC_API_URL from .env if set)
 const getBaseUrl = () => {
+  if (process.env.EXPO_PUBLIC_API_URL && process.env.EXPO_PUBLIC_API_URL.trim() !== '') {
+    return process.env.EXPO_PUBLIC_API_URL.trim();
+  }
+
   const hostUri = Constants.expoConfig?.hostUri || Constants.manifest2?.extra?.expoGo?.developer?.manifest?.debuggerHost || Constants.manifest?.debuggerHost;
   
   if (hostUri) {
